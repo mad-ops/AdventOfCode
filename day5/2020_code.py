@@ -23,14 +23,28 @@ def parser(l, h, spread, value):
 def seatId(row, column):
     return row * 8 + column
 
+def returnSeatId(value):
+    row = parser('F','B', 128, value[:-3])
+    column = parser('L','R', 8, value[-3:])
+    return seatId(row, column)
+
 def tester(test, answer):
-    TEST_ROW = parser('F','B', 128, test[:-3])
-    TEST_SEAT = parser('L','R', 8, test[-3:])
-    assert seatId(TEST_ROW, TEST_SEAT) == answer
+    assert returnSeatId(test) == answer
 
 tester('FBFBBFFRLR',357)
 tester('BFFFBBFRRR',567)
 tester('FFFBBBFRRR',119)
 tester('BBFFBBFRLL',820)
 
-print("yeet")
+def p1(seatList):
+    seatList = [returnSeatId(seat) for seat in seatList]
+    return max(seatList)
+
+def p2(seatList):
+    seatList = [returnSeatId(seat) for seat in seatList] 
+    seatList.sort()
+    haystack = [x - seatList[i - 1] for i, x in enumerate(seatList)][1:]
+    return seatList[haystack.index(2)] + 1
+
+print(p1(seatList))
+print(p2(seatList))
