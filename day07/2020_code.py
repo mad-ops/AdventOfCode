@@ -10,14 +10,34 @@ faded blue bags contain no other bags.
 dotted black bags contain no other bags.'''
 
 bagStripper = re.compile('''(\d|no) (.*) bag.?s?''')
+lookup = dict()
 for line in TEST_INPUT.split('\n'):
     parsed = line.split('contain')
     key = ' '.join(parsed[0].split(' ')[:2])
     for x in parsed[1].split(','):
         quant, qual = bagStripper.search(x).group(1,2)
-        print(quant,qual)
+        if key not in lookup:
+            lookup[key] = list()
+        lookup[key].append((quant, qual))
 
-def bag():
-    return 1
+def bagFinder(type):
+    containingBags = set()
+    for key in lookup:
+        for bag in lookup[key]:
+            if type == bag[1]:
+               qual = ' '.join(key.split(' ')[:2])
+               containingBags.add(qual)
+    return containingBags
 
-assert bag() == 4
+def bagAudit(type):
+    processedBags = set()
+    unProcessedBags = set()
+    unProcessedBags.add(type)
+    while len(unProcessedBags) != 0:
+        queued = unProcessedBags.pop()
+        hits = bagFinder(queued)
+        unProcessedBags = unProcessedBags | hits
+        processedBags = processedBags | hits
+    return len(processedBags)
+
+assert bagAudit('shiny gold') == 4
